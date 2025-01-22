@@ -31,6 +31,7 @@ screen.fill(WHITE)
 board = [[None for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
 current_player = "X"  # Player always starts as "X"
 game_over = False
+winner = None
 
 # Draw grid
 def draw_grid():
@@ -52,27 +53,21 @@ def draw_o(row, col):
 
 # Check winner
 def check_winner():
-    global game_over
     # Check rows and columns
     for i in range(GRID_SIZE):
         if board[i][0] == board[i][1] == board[i][2] and board[i][0] is not None:
-            game_over = True
             return board[i][0]
         if board[0][i] == board[1][i] == board[2][i] and board[0][i] is not None:
-            game_over = True
             return board[0][i]
 
     # Check diagonals
     if board[0][0] == board[1][1] == board[2][2] and board[0][0] is not None:
-        game_over = True
         return board[0][0]
     if board[0][2] == board[1][1] == board[2][0] and board[0][2] is not None:
-        game_over = True
         return board[0][2]
 
     # Check for draw
     if all(all(cell is not None for cell in row) for row in board):
-        game_over = True
         return "Draw"
 
     return None
@@ -113,7 +108,7 @@ def ai_move():
 
 # Main game loop
 def main():
-    global current_player
+    global current_player, game_over, winner
     running = True
     draw_grid()
 
@@ -134,8 +129,7 @@ def main():
 
                     winner = check_winner()
                     if winner:
-                        print(f"Winner: {winner}")
-                        running = False
+                        game_over = True
 
         if current_player == "O" and not game_over:
             pygame.time.wait(500)  # Delay for realism
@@ -143,10 +137,14 @@ def main():
 
             winner = check_winner()
             if winner:
-                print(f"Winner: {winner}")
-                running = False
+                game_over = True
 
         pygame.display.update()
+
+    # Display winner or draw message
+    if game_over:
+        print(f"Winner: {winner}")
+        pygame.time.wait(2000)  # Pause for 2 seconds before exiting
 
 if __name__ == "__main__":
     main()
